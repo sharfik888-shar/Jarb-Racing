@@ -35,80 +35,128 @@
         document.getElementById('gasBtn').addEventListener('touchend', (e) => { e.preventDefault(); gasPressed = false; });
         document.getElementById('brakeBtn').addEventListener('touchstart', (e) => { e.preventDefault(); brakePressed = true; });
         document.getElementById('brakeBtn').addEventListener('touchend', (e) => { e.preventDefault(); brakePressed = false; });
-
-        // Для теста на компьютере (мышка)
+        
+        // Для ПК
         document.getElementById('gasBtn').addEventListener('mousedown', () => gasPressed = true);
         document.getElementById('gasBtn').addEventListener('mouseup', () => gasPressed = false);
         document.getElementById('brakeBtn').addEventListener('mousedown', () => brakePressed = true);
         document.getElementById('brakeBtn').addEventListener('mouseup', () => brakePressed = false);
 
-        // Физика
-        const gravity = 0.5;
-        const friction = 0.98;
-        
+        // --- Физическая машина ---
+        // Кузов
         let car = {
             x: width / 2,
             y: height / 2,
             vx: 0,
             vy: 0,
             angle: 0,
-            width: 60,
-            height: 30
+            angVel: 0,
+            width: 70,
+            height: 30,
+            mass: 1,
+            wheelBase: 50, // Расстояние между колесами
+            wheelRadius: 15
         };
 
         let cameraX = 0;
-        let speed = 0;
 
         // Генерация земли
         let terrain = [];
         for(let i = 0; i < 5000; i++) {
-            terrain.push(height - 100 + Math.sin(i * 0.01) * 50 + Math.sin(i * 0.03) * 20);
+            terrain.push(height - 150 + Math.sin(i * 0.015) * 60 + Math.sin(i * 0.04) * 25);
         }
 
         function getTerrainHeight(x) {
             let index = Math.floor(x);
-            if(index < 0) return height - 100;
+            if(index < 0) return height - 150;
             if(index >= terrain.length - 1) return terrain[terrain.length - 1];
             return terrain[index];
         }
 
         function update() {
-            // Газ и тормоз
-            if(gasPressed) car.vx += 0.3;
-            if(brakePressed) car.vx -= 0.3;
-
-            // Трение
-            car.vx *= friction;
-            
             // Гравитация
-            car.vy += gravity;
+            car.vy += 0.5;
 
+            // Управление (крутящий момент)
+            let torque = 0;
+            if (gasPressed) torque = 0.15; // Газ вперед
+            if (brakePressed) torque = -0.15; // Тормоз/назад
+
+            // Применяем к скорости колес (упрощенно)
+            car.vx += torque * 2;
+            
+            // Трение
+            car.vx *= 0.99;
+            car.vy *= 0.99;
+            car.angVel *= 0.95;
+
+            // Наклон машины от газа (имитация подвески)
+            if (gasPressed) car.angVel -= 0.002;
+            if (brakePressed) car.angVel += 0.002;
+
+            // Обновление позиции
             car.x += car.vx;
             car.y += car.vy;
+            car.angle += car.angVel;
 
-            // Коллизия с землей (упрощенная)
-            let groundY = getTerrainHeight(car.x);
-            if (car.y + car.height / 2 > groundY) {
-                car.y = groundY - car.height / 2;
+            // Коллизия с землей (упрощенная через 2 точки - колеса)
+            // Переднее колесо
+            let frontX = car.x + Math.cos(car.angle) * (car.wheelBase/2);
+            let frontY = car.y + Math.sin(car.angle) * (car.wheelBase/2) + car.height/2;
+            let groundFront = getTerrainHeight(frontX);
+
+            // Заднее колесо
+            let rearX = car.x - Math.cos(car.angle) * (car.wheelBase/2);
+            let rearY = car.y - Math.sin(car.angle) * (car.wheelBase/2) + car.height/2;
+            let groundRear = getTerrainHeight(rearX);
+
+            // Простая физика подвески
+            let hitFront = frontY > groundFront;
+            let hitRear = rearY > groundRear;
+
+            if (hitFront && hitRear) {
+                // Оба колеса на земле
+                car.y = Math.min(groundFront, groundRear) - car.height/2;
                 car.vy = 0;
-                // Наклон в зависимости от наклона земли
-                let nextY = getTerrainHeight(car.x + 10);
-                let angle = Math.atan2(nextY - groundY, 10);
-                car.angle = angle;
+                
+                // Выравнивание по наклону
+                let angleToGround = Math.atan2(groundFront - groundRear, car.wheelBase);
+                car.angle = car.angle * 0.8 + angleToGround * 0.2;
+                car.angVel *= 0.5;
+                
+                // Трение о землю
+                car.vx *= 0.95;
+            } else if (hitFront) {
+                // Только переднее
+                car.y = groundFront - car.height/2;
+                car.vy = 0;
+                car.angVel -= 0.01;
+            } else if (hitRear) {
+                // Только заднее
+                car.y = groundRear - car.height/2;
+                car.vy = 0;
+                car.angVel += 0.01;
+            }
+
+            // Если упал слишком низко - респавн
+            if (car.y > height + 500) {
+                car.x = 100;
+                car.y = getTerrainHeight(100) - 100;
+                car.vx = 0;
+                car.vy = 0;
+                car.angle = 0;
+                car.angVel = 0;
             }
 
             // Камера
             cameraX = car.x - width / 3;
-
-            // Счетчик скорости
-            speed = Math.floor(Math.abs(car.vx) * 20);
 
             draw();
             requestAnimationFrame(update);
         }
 
         function draw() {
-            // Очистка
+            // Небо
             ctx.fillStyle = '#87CEEB';
             ctx.fillRect(0, 0, width, height);
 
@@ -130,16 +178,16 @@
             ctx.rotate(car.angle);
             
             // Кузов
-            ctx.fillStyle = '#ff0000'; // Красный цвет для теста
+            ctx.fillStyle = '#ff0000'; 
             ctx.fillRect(-car.width/2, -car.height/2, car.width, car.height);
             
             // Колеса
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = '#333';
             ctx.beginPath();
-            ctx.arc(-car.width/3, car.height/2, 10, 0, Math.PI * 2);
+            ctx.arc(-car.wheelBase/2, car.height/2, car.wheelRadius, 0, Math.PI * 2);
             ctx.fill();
             ctx.beginPath();
-            ctx.arc(car.width/3, car.height/2, 10, 0, Math.PI * 2);
+            ctx.arc(car.wheelBase/2, car.height/2, car.wheelRadius, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.restore();
@@ -147,6 +195,7 @@
             // UI Скорость
             ctx.fillStyle = '#000';
             ctx.font = '24px Arial';
+            let speed = Math.floor(Math.abs(car.vx) * 10);
             ctx.fillText('Скорость: ' + speed + ' км/ч', 20, 40);
         }
 
