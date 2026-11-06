@@ -8,7 +8,7 @@
         body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; touch-action: none; }
         canvas { display: block; }
         
-        /* --- МЕНЮ --- */
+        /* --- ЭКРАНЫ --- */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -16,54 +16,61 @@
         }
         .screen.active { display: flex; }
         
-        h1 { color: #fff; font-size: 40px; text-shadow: 3px 3px 0 #ff0000; margin-bottom: 20px; font-style: italic; }
-        h2 { color: #fff; font-size: 28px; margin-bottom: 15px; }
+        h1 { color: #fff; font-size: 42px; text-shadow: 3px 3px 0 #e53935, 0 0 20px rgba(0,0,0,0.5); margin-bottom: 20px; font-style: italic; letter-spacing: 1px; }
+        h2 { color: #fff; font-size: 28px; margin-bottom: 15px; text-shadow: 2px 2px 0 #000; }
         
         .menu-btn {
             background: linear-gradient(to bottom, #ffcc00, #ff9900); 
             border: 2px solid #fff; padding: 12px 30px; font-size: 20px; font-weight: bold; border-radius: 10px;
-            margin: 8px; cursor: pointer; color: #333; box-shadow: 0 5px 0 #b30000; transition: transform 0.1s;
-            width: 220px; text-align: center;
+            margin: 8px; cursor: pointer; color: #222; box-shadow: 0 5px 0 #b30000; transition: transform 0.1s;
+            width: 240px; text-align: center;
         }
         .menu-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #b30000; }
 
-        /* Настройки в углу */
-        #settings { position: absolute; top: 20px; right: 20px; z-index: 11; display: flex; gap: 15px; }
-        .icon-btn {
-            width: 50px; height: 50px; background: rgba(255,255,255,0.9);
-            border: 2px solid #333; border-radius: 50%; display: flex;
-            justify-content: center; align-items: center; font-size: 24px; cursor: pointer;
-        }
+        /* Настройки в меню */
+        #settingsMenu .menu-btn { background: linear-gradient(to bottom, #4caf50, #2e7d32); box-shadow: 0 5px 0 #1b5e20; }
 
         /* Гараж */
-        .car-list { display: flex; flex-direction: column; gap: 10px; width: 80%; max-width: 400px; }
+        .car-list { display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; max-height: 60vh; overflow-y: auto; padding: 5px; }
         .car-card {
-            background: rgba(255,255,255,0.1); border: 2px solid #fff; padding: 10px; border-radius: 10px;
+            background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 12px;
             display: flex; justify-content: space-between; align-items: center; color: #fff;
         }
-        .car-card.selected { border-color: #ffcc00; background: rgba(255,204,0,0.2); }
-        .car-card button { background: #4caf50; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        .car-card button:disabled { background: #888; cursor: not-allowed; }
+        .car-card.selected { border-color: #ffcc00; background: rgba(255,204,0,0.15); box-shadow: 0 0 10px rgba(255,204,0,0.3); }
+        .car-card button { background: #4caf50; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; }
+        .car-card button:disabled { background: #777; cursor: not-allowed; }
+        .car-card button.buy-btn { background: #2196f3; }
         
         /* Прокачка */
-        .upgrade-row { display: flex; justify-content: space-between; width: 80%; max-width: 400px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; color: #fff; margin-bottom: 10px; align-items: center;}
-        .upgrade-row button { background: #ffcc00; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .upgrade-row { display: flex; justify-content: space-between; width: 85%; max-width: 400px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; color: #fff; margin-bottom: 10px; align-items: center;}
+        .upgrade-row button { background: #ffcc00; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; color: #222; }
 
-        /* Педали */
+        /* Интерфейс игры */
         #game-ui {
             position: absolute; bottom: 20px; width: 100%; display: none;
             justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 5;
         }
         .pedal {
-            width: 90px; height: 90px; background: rgba(255,255,255,0.4);
-            border: 3px solid #333; border-radius: 50%; display: flex;
+            width: 90px; height: 90px; background: rgba(255,255,255,0.3);
+            border: 3px solid rgba(0,0,0,0.5); border-radius: 50%; display: flex;
             justify-content: center; align-items: center; font-size: 40px; font-weight: bold;
-            user-select: none; -webkit-user-select: none;
+            user-select: none; -webkit-user-select: none; backdrop-filter: blur(5px); color: #000;
         }
         .pedal:active { background: rgba(255,255,255,0.8); }
         
-        /* Кнопка паузы */
-        #pauseBtn { position: absolute; top: 20px; left: 20px; z-index: 11; display: none; background: rgba(0,0,0,0.5); color: #fff; border: 2px solid #fff; border-radius: 10px; padding: 10px 20px; font-weight: bold; }
+        /* Кнопки в игре */
+        #inGameSettings { 
+            position: absolute; top: 20px; right: 20px; z-index: 11; display: none; 
+            background: rgba(0,0,0,0.6); color: #fff; border: 2px solid #fff; 
+            border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer;
+            justify-content: center; align-items: center;
+        }
+        
+        #gameStats {
+            position: absolute; top: 20px; left: 20px; z-index: 11; display: none;
+            background: rgba(0,0,0,0.6); color: #fff; padding: 10px 15px; border-radius: 10px;
+            font-size: 18px; font-weight: bold; border: 1px solid #fff;
+        }
     </style>
 </head>
 <body>
@@ -74,39 +81,42 @@
         <h1>JARB RACING</h1>
         <button class="menu-btn" onclick="showScreen('garageMenu')">МАШИНЫ</button>
         <button class="menu-btn" onclick="startGame()">ИГРАТЬ</button>
-        <button class="menu-btn" onclick="alert('Настройки в разработке')">НАСТРОЙКИ</button>
+        <button class="menu-btn" onclick="showScreen('settingsMenu')">НАСТРОЙКИ</button>
     </div>
 
-    <!-- Меню Гаража -->
+    <!-- Гараж -->
     <div id="garageMenu" class="screen">
         <h2>ГАРАЖ</h2>
         <div class="car-list" id="carList"></div>
         <button class="menu-btn" style="margin-top:20px" onclick="showScreen('mainMenu')">НАЗАД</button>
     </div>
 
-    <!-- Меню Прокачки -->
+    <!-- Тюнинг -->
     <div id="upgradeMenu" class="screen">
-        <h2 id="upgradeTitle">ПРОКАЧКА</h2>
+        <h2 id="upgradeTitle">ТЮНИНГ</h2>
         <div class="upgrade-row">
             <span>Двигатель (Ур. <span id="engLvl">1</span>)</span>
-            <button onclick="upgradePart('engine')">Улучшить (500)</button>
+            <button onclick="upgradePart('engine')">Улучшить ($500)</button>
         </div>
         <div class="upgrade-row">
             <span>Подвеска (Ур. <span id="susLvl">1</span>)</span>
-            <button onclick="upgradePart('suspension')">Улучшить (300)</button>
+            <button onclick="upgradePart('suspension')">Улучшить ($300)</button>
         </div>
         <button class="menu-btn" style="margin-top:20px" onclick="showScreen('garageMenu')">НАЗАД</button>
     </div>
 
     <!-- Настройки -->
-    <div id="settings">
-        <div class="icon-btn" id="musicToggle">🎵</div>
-        <div class="icon-btn" id="soundToggle">🔊</div>
+    <div id="settingsMenu" class="screen">
+        <h2>НАСТРОЙКИ</h2>
+        <button class="menu-btn" onclick="toggleSound()">ЗВУК: <span id="soundStatus">ВКЛ</span></button>
+        <button class="menu-btn" onclick="toggleMusic()">МУЗЫКА: <span id="musicStatus">ВКЛ</span></button>
+        <button class="menu-btn" style="margin-top:20px" onclick="showScreen('mainMenu')">НАЗАД</button>
     </div>
-    
-    <button id="pauseBtn" onclick="pauseGame()">ПАУЗА</button>
 
-    <!-- Игровой интерфейс -->
+    <!-- Интерфейс игры -->
+    <div id="gameStats">$<span id="moneyDisplay">0</span> | <span id="distDisplay">0</span>м</div>
+    <div id="inGameSettings" onclick="pauseGame()">⚙️</div>
+    
     <div id="game-ui">
         <div class="pedal" id="brakeBtn">◀</div>
         <div class="pedal" id="gasBtn">▶</div>
@@ -120,17 +130,21 @@
         canvas.width = width;
         canvas.height = height;
 
-        // --- БАЗА МАШИН ---
+        // --- БАЗА ДАННЫХ ---
         const carDatabase = [
             { id: 'cobalt', name: 'Chevrolet Cobalt', color: '#b0bec5', engine: 1, suspension: 1, price: 0, owned: true, type: 'sedan' },
-            { id: 'mark2', name: 'Toyota Mark II (100)', color: '#e0e0e0', engine: 1, suspension: 1, price: 1000, owned: false, type: 'sedan' },
-            { id: 'camry', name: 'Toyota Camry', color: '#fff', engine: 1, suspension: 1, price: 2500, owned: false, type: 'sedan' },
-            { id: 'tucson', name: 'Hyundai Tucson', color: '#4caf50', engine: 1, suspension: 1, price: 5000, owned: false, type: 'suv' }
+            { id: 'mark2', name: 'Toyota Mark II', color: '#f5f5f5', engine: 1, suspension: 1, price: 1500, owned: false, type: 'sedan' },
+            { id: 'camry', name: 'Toyota Camry', color: '#37474f', engine: 1, suspension: 1, price: 3000, owned: false, type: 'sedan' },
+            { id: 'tucson', name: 'Hyundai Tucson', color: '#43a047', engine: 1, suspension: 1, price: 6000, owned: false, type: 'suv' }
         ];
         let selectedCar = carDatabase[0];
-        let money = 1500; // Начальный капитал
+        
+        // --- ИГРОВЫЕ ДАННЫЕ (Сохраняются пока открыта вкладка) ---
+        let money = 1500; 
+        let totalDistance = 0;
+        let currentRunDistance = 0;
 
-        // --- ИГРОВЫЕ ПЕРЕМЕННЫЕ ---
+        // --- ПЕРЕМЕННЫЕ ---
         let isPlaying = false;
         let isPaused = false;
         let musicOn = true, soundOn = true;
@@ -140,7 +154,7 @@
 
         const car = {
             x: 200, y: 100, vx: 0, vy: 0, angle: 0, angVel: 0,
-            width: 90, height: 40, wheelBase: 65, wheelRadius: 18
+            width: 100, height: 45, wheelBase: 70, wheelRadius: 20
         };
 
         let terrain = [], puddles = [], clouds = [], birds = [], animals = [];
@@ -155,17 +169,19 @@
             for (let x = startX; x < endX; x += 10) {
                 if (x % 1500 === 0 && Math.random() < 0.4) puddles.push({ x: x, w: 150 + Math.random() * 200 });
                 
-                // Плавные горы (синусоиды)
+                // Плавные горы
                 let y = height - 100 + Math.sin(x * 0.002) * 80 + Math.sin(x * 0.005) * 40 + Math.sin(x * 0.0008) * 150;
                 terrain.push({ x: x, y: y });
                 
-                // Животные (Спавн)
+                // Животные
                 if (x % 300 === 0 && Math.random() < 0.4) {
                     let types = ['cow', 'horse', 'goat'];
                     animals.push({ x: x, type: types[Math.floor(Math.random()*3)], offsetY: Math.random() * 40 });
                 }
             }
         }
+        
+        // Инициализация первого куска земли
         generateTerrain(-1000, 5000);
 
         function getTerrainY(x) {
@@ -175,10 +191,11 @@
             return terrain[index].y;
         }
 
-        // --- УПРАВЛЕНИЕ ЭКРАНАМИ ---
+        // --- МЕНЮ ---
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            if(id !== 'none') document.getElementById(id).classList.add('active');
+            
             if(id === 'garageMenu') renderGarage();
             if(id === 'upgradeMenu') renderUpgrades();
         }
@@ -188,21 +205,21 @@
             carDatabase.forEach(c => {
                 let isSel = selectedCar.id === c.id;
                 let btn = c.owned 
-                    ? `<button onclick="selectCar('${c.id}')" ${isSel?'disabled':''}>${isSel?'Выбрана':'Выбрать'}</button>`
-                    : `<button onclick="buyCar('${c.id}')">Купить (${c.price})</button>`;
+                    ? `<button onclick="selectCar('${c.id}')" ${isSel?'disabled':''}>${isSel?'ВЫБРАНА':'ВЫБРАТЬ'}</button>`
+                    : `<button class="buy-btn" onclick="buyCar('${c.id}')">$${c.price}</button>`;
                 
-                let upgBtn = c.owned ? `<button style="background:#2196f3; margin-left:5px" onclick="openUpgrades('${c.id}')">Тюнинг</button>` : '';
+                let upgBtn = c.owned ? `<button style="background:#ff9800; margin-left:5px" onclick="openUpgrades('${c.id}')">⚙️</button>` : '';
                 
                 html += `
                 <div class="car-card ${isSel?'selected':''}">
                     <div>
                         <strong>${c.name}</strong><br>
-                        <small>Двиг: ${c.engine} | Подв: ${c.suspension}</small>
+                        <small style="color:#bbb">Двиг: ${c.engine} | Подв: ${c.suspension}</small>
                     </div>
                     <div>${btn}${upgBtn}</div>
                 </div>`;
             });
-            html += `<div style="color:#ffcc00; font-size:20px; margin-top:10px; text-align:center;">Монеты: ${money}</div>`;
+            html += `<div style="color:#4caf50; font-size:24px; margin-top:10px; text-align:center; font-weight:bold;">Баланс: $${money}</div>`;
             document.getElementById('carList').innerHTML = html;
         }
 
@@ -219,7 +236,7 @@
                 selectedCar = c;
                 renderGarage();
             } else {
-                alert("Недостаточно монет!");
+                alert("Недостаточно долларов!");
             }
         }
 
@@ -246,16 +263,28 @@
             }
         }
 
+        function toggleSound() {
+            soundOn = !soundOn;
+            document.getElementById('soundStatus').innerText = soundOn ? "ВКЛ" : "ВЫКЛ";
+        }
+
+        function toggleMusic() {
+            musicOn = !musicOn;
+            document.getElementById('musicStatus').innerText = musicOn ? "ВКЛ" : "ВЫКЛ";
+        }
+
         function startGame() {
-            showScreen('none'); // Скрываем все меню
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            showScreen('none');
             document.getElementById('game-ui').style.display = 'flex';
-            document.getElementById('pauseBtn').style.display = 'block';
+            document.getElementById('inGameSettings').style.display = 'flex';
+            document.getElementById('gameStats').style.display = 'block';
             
-            // Сброс машины
-            car.x = 200; car.y = getTerrainY(200) - 100;
+            // Спавн на земле
+            car.x = 200; 
+            car.y = getTerrainY(200) - car.height; // Ставим на землю
             car.vx = 0; car.vy = 0; car.angle = 0; car.angVel = 0;
             
+            currentRunDistance = 0;
             isPlaying = true;
             isPaused = false;
             initAudio();
@@ -263,8 +292,8 @@
 
         function pauseGame() {
             isPaused = !isPaused;
-            document.getElementById('pauseBtn').innerText = isPaused ? "ПРОДОЛЖИТЬ" : "ПАУЗА";
-            if(isPaused) showScreen('mainMenu');
+            if(isPaused) showScreen('mainMenu'); // Показываем меню при паузе
+            else showScreen('none');
         }
 
         // --- ЗВУК ---
@@ -282,16 +311,12 @@
         }
         function updateEngineSound(speed) {
             if (!audioCtx || !soundOn) { if(engineGain) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1); return; }
-            // Мощность зависит от уровня двигателя
             let freq = 40 + Math.abs(speed) * 4 + (selectedCar.engine * 10);
             engineOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.1);
             engineGain.gain.setTargetAtTime(0.03, audioCtx.currentTime, 0.1);
         }
 
         // --- ВВОД ---
-        document.getElementById('musicToggle').onclick = (e) => { musicOn = !musicOn; e.target.style.opacity = musicOn ? '1' : '0.3'; };
-        document.getElementById('soundToggle').onclick = (e) => { soundOn = !soundOn; e.target.style.opacity = soundOn ? '1' : '0.3'; };
-
         const bindTouch = (id, val) => {
             const el = document.getElementById(id);
             el.addEventListener('touchstart', (e) => { e.preventDefault(); if(val==='gas') gasPressed = true; else brakePressed = true; });
@@ -302,27 +327,24 @@
         bindTouch('gasBtn', 'gas');
         bindTouch('brakeBtn', 'brake');
 
-        // --- ИГРОВАЯ ЛОГИКА ---
+        // --- ЛОГИКА ---
         function update() {
             if (isPlaying && !isPaused) {
-                car.vy += 0.6; // Гравитация
+                car.vy += 0.6;
 
-                // Характеристики из прокачки
                 let power = 0.3 + (selectedCar.engine * 0.1); 
-                let spring = 0.8 - (selectedCar.suspension * 0.05); // Чем выше, тем мягче
+                let spring = 0.8 - (selectedCar.suspension * 0.05); 
 
                 let torque = 0;
                 if (gasPressed) torque = power;
                 if (brakePressed) torque = -power * 0.8;
 
-                // Проверка на лужу
                 let onPuddle = puddles.some(p => car.x > p.x && car.x < p.x + p.w);
                 if (onPuddle) { torque *= 0.3; car.vx *= 0.9; }
 
                 car.vx += torque;
-                car.vx *= 0.98; // Сопротивление
+                car.vx *= 0.98; 
                 
-                // Крен кузова
                 if (gasPressed) car.angVel -= 0.003;
                 if (brakePressed) car.angVel += 0.003;
 
@@ -330,11 +352,10 @@
                 car.y += car.vy;
                 car.angle += car.angVel;
 
-                // Коллизия (Переднее и Заднее колесо)
+                // Коллизия
                 let fX = car.x + Math.cos(car.angle) * (car.wheelBase/2);
                 let fY = car.y + Math.sin(car.angle) * (car.wheelBase/2) + car.height/2;
                 let gF = getTerrainY(fX);
-
                 let rX = car.x - Math.cos(car.angle) * (car.wheelBase/2);
                 let rY = car.y - Math.sin(car.angle) * (car.wheelBase/2) + car.height/2;
                 let gR = getTerrainY(rX);
@@ -345,12 +366,10 @@
                     if (fY > gF && rY > gR) car.y = Math.min(gF, gR) - car.height/2;
                     car.vy = 0;
                     
-                    // Выравнивание по земле (с учетом подвески)
                     let groundAngle = Math.atan2(gF - gR, car.wheelBase);
                     car.angle = car.angle * spring + groundAngle * (1 - spring);
                     car.angVel *= 0.5;
 
-                    // Пыль из-под колес
                     if (Math.abs(car.vx) > 3 && Math.random() < 0.3) {
                         particles.push({ x: car.x, y: car.y + 20, vx: -car.vx*0.5, vy: -1, life: 1, color: onPuddle ? '#42a5f5' : '#8d6e63' });
                     }
@@ -360,17 +379,26 @@
                 cameraX = car.x - width / 3;
                 cameraY += ((car.y - height * 0.6) - cameraY) * 0.1; 
 
-                // Монеты (имитация проезда)
-                if (Math.random() < 0.02) money += 1; 
+                // --- СИСТЕМА ДЕНЕГ И МЕТРОВ ---
+                currentRunDistance = Math.max(currentRunDistance, Math.floor(car.x / 10)); // 10 пикселей = 1 метр
+                
+                // Начисление денег каждые 250 метров
+                if (currentRunDistance > 0 && currentRunDistance % 250 === 0 && currentRunDistance !== totalDistance) {
+                    money += 5;
+                    totalDistance = currentRunDistance;
+                    // Эффект монетки
+                    particles.push({ x: car.x, y: car.y - 50, vx: 0, vy: -2, life: 1, color: '#ffeb3b', text: '+$5' });
+                }
+
+                document.getElementById('moneyDisplay').innerText = money;
+                document.getElementById('distDisplay').innerText = currentRunDistance;
 
                 updateEngineSound(car.vx);
 
-                // Генерация
                 if (car.x + 2000 > terrain[terrain.length-1].x) generateTerrain(terrain[terrain.length-1].x, terrain[terrain.length-1].x + 2000);
 
-                // Обновление частиц
                 particles.forEach((p, index) => {
-                    p.x += p.vx; p.y += p.vy; p.life -= 0.05;
+                    p.x += p.vx; p.y += p.vy; p.life -= 0.02;
                     if(p.life <= 0) particles.splice(index, 1);
                 });
             }
@@ -379,7 +407,7 @@
             requestAnimationFrame(update);
         }
 
-        // --- ОТРИСОВКА ---
+        // --- ГРАФИКА ---
         function drawCloud(x, y, size) {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
             ctx.beginPath();
@@ -396,81 +424,82 @@
             ctx.moveTo(x - 10, y + wingY); ctx.lineTo(x, y); ctx.lineTo(x + 10, y + wingY); ctx.stroke();
         }
 
-        // Красивые животные (Силуэты)
         function drawAnimal(a, screenX, screenY) {
             ctx.fillStyle = a.type === 'cow' ? '#fff' : (a.type === 'horse' ? '#5d4037' : '#9e9e9e');
-            let scale = a.offsetY / 40 + 0.5; // Животные дальше кажутся меньше
-            ctx.save();
-            ctx.translate(screenX, screenY);
-            ctx.scale(scale, scale);
+            let scale = a.offsetY / 40 + 0.5;
+            ctx.save(); ctx.translate(screenX, screenY); ctx.scale(scale, scale);
             
             if (a.type === 'cow') {
-                // Корова: большое тело, пятна
                 ctx.beginPath(); ctx.ellipse(0, -15, 20, 12, 0, 0, Math.PI*2); ctx.fill();
                 ctx.beginPath(); ctx.arc(15, -20, 8, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#333'; // Пятна
-                ctx.beginPath(); ctx.arc(-5, -15, 5, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc(-5, -15, 5, 0, Math.PI*2); ctx.fill();
                 ctx.fillRect(-15, -5, 4, 15); ctx.fillRect(10, -5, 4, 15);
             } else if (a.type === 'horse') {
-                // Лошадь: вытянутая шея
                 ctx.beginPath(); ctx.ellipse(0, -15, 18, 10, 0, 0, Math.PI*2); ctx.fill();
                 ctx.beginPath(); ctx.moveTo(10, -20); ctx.lineTo(18, -35); ctx.lineTo(22, -35); ctx.lineTo(15, -15); ctx.fill();
                 ctx.fillRect(-12, -5, 3, 15); ctx.fillRect(8, -5, 3, 15);
             } else {
-                // Козел/Овца: пушистый
                 ctx.beginPath(); ctx.arc(0, -15, 12, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#424242'; 
-                ctx.beginPath(); ctx.arc(12, -18, 5, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#424242'; ctx.beginPath(); ctx.arc(12, -18, 5, 0, Math.PI*2); ctx.fill();
                 ctx.fillRect(-8, -5, 3, 10); ctx.fillRect(6, -5, 3, 10);
             }
             ctx.restore();
         }
 
-        // Красивые Машины (Векторные)
+        // ДЕТАЛИЗИРОВАННЫЕ МАШИНЫ
         function drawCarSprite(carType, color) {
             ctx.fillStyle = color;
-            ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+            ctx.strokeStyle = '#111'; ctx.lineWidth = 2;
 
             if (carType === 'sedan') {
-                // Кузов седана (Cobalt/Mark II)
+                // Силуэт седана (Mark II / Cobalt)
                 ctx.beginPath();
-                ctx.moveTo(-45, 0); // Задний бампер
-                ctx.lineTo(-40, -20); // Багажник
-                ctx.lineTo(-15, -25); // Заднее стекло
-                ctx.lineTo(15, -25); // Крыша
-                ctx.lineTo(35, -15); // Лобовое стекло
-                ctx.lineTo(45, -5); // Капот
-                ctx.lineTo(45, 0); // Передний бампер
+                ctx.moveTo(-50, 0); // Задний бампер
+                ctx.lineTo(-45, -25); // Багажник
+                ctx.lineTo(-20, -35); // Заднее стекло
+                ctx.lineTo(15, -35); // Крыша
+                ctx.lineTo(35, -20); // Лобовое
+                ctx.lineTo(50, -10); // Капот
+                ctx.lineTo(50, 0); // Передний бампер
                 ctx.closePath();
                 ctx.fill(); ctx.stroke();
 
                 // Стекла
-                ctx.fillStyle = '#64b5f6';
-                ctx.beginPath(); ctx.moveTo(-35, -20); ctx.lineTo(-10, -22); ctx.lineTo(-5, -10); ctx.lineTo(-35, -10); ctx.fill();
-                ctx.beginPath(); ctx.moveTo(0, -22); ctx.lineTo(25, -15); ctx.lineTo(30, -10); ctx.lineTo(0, -10); ctx.fill();
+                ctx.fillStyle = '#263238';
+                ctx.beginPath(); ctx.moveTo(-35, -25); ctx.lineTo(-15, -32); ctx.lineTo(-10, -15); ctx.lineTo(-35, -15); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(0, -32); ctx.lineTo(30, -20); ctx.lineTo(35, -15); ctx.lineTo(0, -15); ctx.fill();
                 
-                // Фары
-                ctx.fillStyle = '#ffee58'; ctx.fillRect(40, -10, 5, 5);
-                ctx.fillStyle = '#ef5350'; ctx.fillRect(-45, -10, 5, 5);
+                // Детали: ручки, зеркала, фары
+                ctx.fillStyle = '#000'; ctx.fillRect(-15, -20, 6, 2); ctx.fillRect(10, -20, 6, 2); // Ручки
+                ctx.fillRect(35, -22, 5, 4); // Зеркало
+                ctx.fillStyle = '#ffeb3b'; ctx.fillRect(45, -12, 5, 6); // Фара
+                ctx.fillStyle = '#f44336'; ctx.fillRect(-50, -12, 5, 6); // Задний фонарь
+                
+                // Порог
+                ctx.fillStyle = '#111'; ctx.fillRect(-40, 0, 80, 5);
             } else {
                 // Внедорожник (Tucson)
                 ctx.beginPath();
-                ctx.moveTo(-45, 0); ctx.lineTo(-45, -20); ctx.lineTo(-30, -30);
-                ctx.lineTo(15, -30); ctx.lineTo(35, -20); ctx.lineTo(45, 0);
+                ctx.moveTo(-50, 0); ctx.lineTo(-50, -25); ctx.lineTo(-35, -40);
+                ctx.lineTo(15, -40); ctx.lineTo(40, -25); ctx.lineTo(50, 0);
                 ctx.closePath(); ctx.fill(); ctx.stroke();
                 
                 // Стекла
-                ctx.fillStyle = '#64b5f6';
-                ctx.fillRect(-40, -25, 25, 15); ctx.fillRect(-10, -28, 25, 18);
+                ctx.fillStyle = '#263238';
+                ctx.fillRect(-45, -32, 30, 18); ctx.fillRect(-10, -35, 30, 20);
+
+                // Детали: рейлинги на крыше
+                ctx.fillStyle = '#000'; ctx.fillRect(-30, -43, 40, 3);
+                ctx.fillRect(35, -25, 6, 5); // Зеркало
+                ctx.fillStyle = '#ffeb3b'; ctx.fillRect(45, -15, 5, 8); // Фара
             }
         }
 
         function drawSpeedometer(speed) {
             let cx = width / 2, cy = height - 50, r = 70;
-            ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 0); ctx.fill();
+            ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 0); ctx.fill();
             ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(cx, cy, r-5, Math.PI, 0); ctx.stroke();
             
-            // Деления
             for(let i=0; i<=10; i++) {
                 let ang = Math.PI + (Math.PI/10)*i;
                 ctx.beginPath(); ctx.moveTo(cx + Math.cos(ang)*(r-15), cy + Math.sin(ang)*(r-15));
@@ -479,7 +508,7 @@
 
             let maxSpeed = 200;
             let angle = Math.PI + (Math.PI * Math.min(speed, maxSpeed) / maxSpeed);
-            ctx.strokeStyle = '#ff0000'; ctx.lineWidth = 5;
+            ctx.strokeStyle = '#f44336'; ctx.lineWidth = 5;
             ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(angle) * (r - 20), cy + Math.sin(angle) * (r - 20)); ctx.stroke();
             
             ctx.fillStyle = '#fff'; ctx.font = 'bold 22px Arial'; ctx.textAlign = 'center';
@@ -488,56 +517,44 @@
         }
 
         function draw() {
-            // Небо с рассветом
+            // Небо
             let grad = ctx.createLinearGradient(0, 0, 0, height);
-            grad.addColorStop(0, '#2196f3'); grad.addColorStop(0.7, '#81d4fa'); grad.addColorStop(1, '#e1f5fe');
+            grad.addColorStop(0, '#1e88e5'); grad.addColorStop(0.6, '#90caf9'); grad.addColorStop(1, '#e3f2fd');
             ctx.fillStyle = grad; ctx.fillRect(0, 0, width, height);
 
             clouds.forEach(c => drawCloud(c.x, c.y, c.size));
             birds.forEach(b => { b.frame += 0.1; drawBird(b.x, b.y, b.frame); });
 
-            // --- КРАСИВАЯ ЗЕМЛЯ ---
-            // 1. Трава (верхний слой)
+            // Земля (Трава + Грунт)
             ctx.fillStyle = '#4caf50';
-            ctx.beginPath();
-            ctx.moveTo(-100, height + 200);
-            let started = false;
+            ctx.beginPath(); ctx.moveTo(-100, height + 200); let started = false;
             for (let i = 0; i < terrain.length; i++) {
                 let p = terrain[i]; let sx = p.x - cameraX; let sy = p.y - cameraY;
                 if (sx > -100 && sx < width + 100) {
-                    if (!started) { ctx.lineTo(sx, sy); started = true; }
-                    else ctx.lineTo(sx, sy);
+                    if (!started) { ctx.lineTo(sx, sy); started = true; } else ctx.lineTo(sx, sy);
                 }
             }
             ctx.lineTo(width + 100, height + 200); ctx.closePath(); ctx.fill();
 
-            // 2. Земля (нижний слой, смещен вниз)
-            ctx.fillStyle = '#795548';
-            ctx.beginPath();
-            ctx.moveTo(-100, height + 200); started = false;
+            ctx.fillStyle = '#5d4037';
+            ctx.beginPath(); ctx.moveTo(-100, height + 200); started = false;
             for (let i = 0; i < terrain.length; i++) {
-                let p = terrain[i]; let sx = p.x - cameraX; let sy = p.y - cameraY + 15; // Смещение вниз для эффекта толщины травы
+                let p = terrain[i]; let sx = p.x - cameraX; let sy = p.y - cameraY + 15;
                 if (sx > -100 && sx < width + 100) {
-                    if (!started) { ctx.lineTo(sx, sy); started = true; }
-                    else ctx.lineTo(sx, sy);
+                    if (!started) { ctx.lineTo(sx, sy); started = true; } else ctx.lineTo(sx, sy);
                 }
             }
             ctx.lineTo(width + 100, height + 200); ctx.closePath(); ctx.fill();
 
-            // Животные
             animals.forEach(a => {
                 let sx = a.x - cameraX;
-                if (sx > -100 && sx < width + 100) {
-                    drawAnimal(a, sx, getTerrainY(a.x) - cameraY);
-                }
+                if (sx > -100 && sx < width + 100) drawAnimal(a, sx, getTerrainY(a.x) - cameraY);
             });
 
-            // Лужи
             puddles.forEach(p => {
                 let sx = p.x - cameraX;
                 if (sx > -300 && sx < width + 300) {
-                    ctx.fillStyle = 'rgba(33, 150, 243, 0.6)';
-                    ctx.beginPath();
+                    ctx.fillStyle = 'rgba(33, 150, 243, 0.6)'; ctx.beginPath();
                     ctx.moveTo(p.x - cameraX, getTerrainY(p.x) - cameraY + 5);
                     for (let x = p.x; x <= p.x + p.w; x += 20) ctx.lineTo(x - cameraX, getTerrainY(x) - cameraY + 5);
                     for (let x = p.x + p.w; x >= p.x; x -= 20) ctx.lineTo(x - cameraX, getTerrainY(x) - cameraY + 15);
@@ -545,10 +562,15 @@
                 }
             });
 
-            // Частицы (пыль/брызги)
             particles.forEach(p => {
-                ctx.fillStyle = `rgba(121, 85, 72, ${p.life})`;
-                ctx.beginPath(); ctx.arc(p.x - cameraX, p.y - cameraY, 3, 0, Math.PI*2); ctx.fill();
+                if(p.text) {
+                    ctx.fillStyle = `rgba(255, 235, 59, ${p.life})`;
+                    ctx.font = 'bold 20px Arial';
+                    ctx.fillText(p.text, p.x - cameraX, p.y - cameraY);
+                } else {
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath(); ctx.arc(p.x - cameraX, p.y - cameraY, 3, 0, Math.PI*2); ctx.fill();
+                }
             });
 
             // МАШИНА
@@ -556,34 +578,23 @@
             ctx.translate(car.x - cameraX, car.y - cameraY);
             ctx.rotate(car.angle);
             
-            // Тень
             ctx.fillStyle = 'rgba(0,0,0,0.3)';
-            ctx.beginPath(); ctx.ellipse(0, 15, 45, 10, 0, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(0, 20, 55, 12, 0, 0, Math.PI*2); ctx.fill();
 
-            // Кузов
             drawCarSprite(selectedCar.type, selectedCar.color);
 
             // Колеса
-            ctx.fillStyle = '#212121';
+            ctx.fillStyle = '#111';
             ctx.beginPath(); ctx.arc(-car.wheelBase/2, car.height/2 - 5, car.wheelRadius, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(car.wheelBase/2, car.height/2 - 5, car.wheelRadius, 0, Math.PI * 2); ctx.fill();
             
-            // Диски
-            ctx.fillStyle = '#9e9e9e';
+            ctx.fillStyle = '#bdbdbd';
             ctx.beginPath(); ctx.arc(-car.wheelBase/2, car.height/2 - 5, car.wheelRadius/2, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(car.wheelBase/2, car.height/2 - 5, car.wheelRadius/2, 0, Math.PI * 2); ctx.fill();
 
             ctx.restore();
 
-            // Спидометр и монеты
-            if (isPlaying) {
-                drawSpeedometer(Math.abs(car.vx) * 15);
-                
-                // Монеты на экране
-                ctx.fillStyle = '#ffeb3b';
-                ctx.font = 'bold 24px Arial';
-                ctx.fillText('🪙 ' + money, width - 120, 40);
-            }
+            if (isPlaying) drawSpeedometer(Math.abs(car.vx) * 15);
         }
 
         update();
