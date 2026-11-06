@@ -1,1 +1,156 @@
-<h1>Моя игра</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Jarb Racing</title>
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; background: #87CEEB; touch-action: none; }
+        canvas { display: block; }
+        #ui { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; box-sizing: border-box; }
+        .btn { width: 80px; height: 80px; background: rgba(255,255,255,0.5); border: 2px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; font-weight: bold; user-select: none; }
+        .btn:active { background: rgba(255,255,255,0.8); }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="ui">
+        <div class="btn" id="brakeBtn">◀</div>
+        <div class="btn" id="gasBtn">▶</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Управление
+        let gasPressed = false;
+        let brakePressed = false;
+
+        document.getElementById('gasBtn').addEventListener('touchstart', (e) => { e.preventDefault(); gasPressed = true; });
+        document.getElementById('gasBtn').addEventListener('touchend', (e) => { e.preventDefault(); gasPressed = false; });
+        document.getElementById('brakeBtn').addEventListener('touchstart', (e) => { e.preventDefault(); brakePressed = true; });
+        document.getElementById('brakeBtn').addEventListener('touchend', (e) => { e.preventDefault(); brakePressed = false; });
+
+        // Для теста на компьютере (мышка)
+        document.getElementById('gasBtn').addEventListener('mousedown', () => gasPressed = true);
+        document.getElementById('gasBtn').addEventListener('mouseup', () => gasPressed = false);
+        document.getElementById('brakeBtn').addEventListener('mousedown', () => brakePressed = true);
+        document.getElementById('brakeBtn').addEventListener('mouseup', () => brakePressed = false);
+
+        // Физика
+        const gravity = 0.5;
+        const friction = 0.98;
+        
+        let car = {
+            x: width / 2,
+            y: height / 2,
+            vx: 0,
+            vy: 0,
+            angle: 0,
+            width: 60,
+            height: 30
+        };
+
+        let cameraX = 0;
+        let speed = 0;
+
+        // Генерация земли
+        let terrain = [];
+        for(let i = 0; i < 5000; i++) {
+            terrain.push(height - 100 + Math.sin(i * 0.01) * 50 + Math.sin(i * 0.03) * 20);
+        }
+
+        function getTerrainHeight(x) {
+            let index = Math.floor(x);
+            if(index < 0) return height - 100;
+            if(index >= terrain.length - 1) return terrain[terrain.length - 1];
+            return terrain[index];
+        }
+
+        function update() {
+            // Газ и тормоз
+            if(gasPressed) car.vx += 0.3;
+            if(brakePressed) car.vx -= 0.3;
+
+            // Трение
+            car.vx *= friction;
+            
+            // Гравитация
+            car.vy += gravity;
+
+            car.x += car.vx;
+            car.y += car.vy;
+
+            // Коллизия с землей (упрощенная)
+            let groundY = getTerrainHeight(car.x);
+            if (car.y + car.height / 2 > groundY) {
+                car.y = groundY - car.height / 2;
+                car.vy = 0;
+                // Наклон в зависимости от наклона земли
+                let nextY = getTerrainHeight(car.x + 10);
+                let angle = Math.atan2(nextY - groundY, 10);
+                car.angle = angle;
+            }
+
+            // Камера
+            cameraX = car.x - width / 3;
+
+            // Счетчик скорости
+            speed = Math.floor(Math.abs(car.vx) * 20);
+
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        function draw() {
+            // Очистка
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, width, height);
+
+            // Земля
+            ctx.fillStyle = '#654321';
+            ctx.beginPath();
+            ctx.moveTo(-cameraX, height);
+            for(let i = 0; i < width + 100; i++) {
+                let worldX = cameraX + i;
+                let y = getTerrainHeight(worldX);
+                ctx.lineTo(i, y);
+            }
+            ctx.lineTo(width, height);
+            ctx.fill();
+
+            // Машина
+            ctx.save();
+            ctx.translate(car.x - cameraX, car.y);
+            ctx.rotate(car.angle);
+            
+            // Кузов
+            ctx.fillStyle = '#ff0000'; // Красный цвет для теста
+            ctx.fillRect(-car.width/2, -car.height/2, car.width, car.height);
+            
+            // Колеса
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(-car.width/3, car.height/2, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(car.width/3, car.height/2, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            // UI Скорость
+            ctx.fillStyle = '#000';
+            ctx.font = '24px Arial';
+            ctx.fillText('Скорость: ' + speed + ' км/ч', 20, 40);
+        }
+
+        update();
+    </script>
+</body>
+</html>
